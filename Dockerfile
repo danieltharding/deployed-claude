@@ -1,4 +1,19 @@
 FROM alpine:latest
 
-RUN apk add --no-cache nodejs npm && \
-    npm install -g @anthropic-ai/claude-code
+RUN apk add --no-cache nodejs npm openssh-server tmux bash && \
+    npm install -g @anthropic-ai/claude-code && \
+    ssh-keygen -A && \
+    mkdir -p /root/.ssh && \
+    chmod 700 /root/.ssh && \
+    echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config && \
+    echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+
+WORKDIR /root
+
+EXPOSE 22
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
