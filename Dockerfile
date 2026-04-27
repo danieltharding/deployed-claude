@@ -1,6 +1,11 @@
 FROM alpine:latest
 
-RUN apk add --no-cache nodejs npm openssh-server tmux bash && \
+RUN apk add --no-cache \
+        nodejs npm \
+        openssh-server openssh-client \
+        tmux bash \
+        git curl jq vim \
+        github-cli && \
     npm install -g @anthropic-ai/claude-code && \
     ssh-keygen -A && \
     mkdir -p /root/.ssh && \
@@ -8,6 +13,8 @@ RUN apk add --no-cache nodejs npm openssh-server tmux bash && \
     echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config && \
     echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config && \
     echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+
+VOLUME /root
 
 WORKDIR /root
 

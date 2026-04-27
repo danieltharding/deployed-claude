@@ -6,7 +6,16 @@ if [ -z "$AUTHORIZED_KEY" ]; then
     exit 1
 fi
 
+# Ensure .ssh dir exists on the persistent volume
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
 echo "$AUTHORIZED_KEY" > /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 
-exec /usr/sbin/sshd -D -e
+/usr/sbin/sshd -e
+
+# Start Claude in a persistent tmux session so it survives SSH disconnects
+tmux new-session -d -s claude claude
+
+# Keep container alive
+tail -f /dev/null
